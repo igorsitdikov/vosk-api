@@ -11,7 +11,7 @@
     <properties>
         <junit.version>4.11</junit.version>
         <javacpp.version>1.5.4</javacpp.version>
-        <jdk.version>1.6</jdk.version>
+        <jdk.version>8</jdk.version>
         <compiler.plugin.version>2.3.2</compiler.plugin.version>
     </properties>
 
@@ -46,8 +46,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${compiler.plugin.version}</version>
                 <configuration>
-                    <source>8</source>
-                    <target>8</target>
+                    <source>${jdk.version}</source>
+                    <target>${jdk.version}</target>
                 </configuration>
             </plugin>
 
@@ -156,11 +156,11 @@
                                 <argument>-Xcompiler</argument>
                                 <argument>-L${basedir}/target/classes/org/kaldi/linux-x86_64</argument>
                                 <argument>-Xcompiler</argument>
-                                <argument>-I/home/s/kaldi/kaldi_/tools/openfst/include</argument>
+                                <argument>-I${user.home}/kaldi/tools/openfst/include</argument>
                                 <argument>-Xcompiler</argument>
                                 <argument>-I${basedir}/../src</argument>
                                 <argument>-Xcompiler</argument>
-                                <argument>-I/home/s/kaldi/kaldi_/src</argument>
+                                <argument>-I${user.home}/kaldi/src</argument>
                                 <argument>-classpath</argument>
                                 <argument>target/classes</argument>
                                 <argument>org.kaldi.Model</argument>
