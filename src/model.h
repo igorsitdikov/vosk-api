@@ -43,9 +43,9 @@ public:
     void Ref();
     void Unref();
     int FindWord(const char *word);
+    ~Model();
 
 protected:
-    ~Model();
     void ConfigureV1();
     void ConfigureV2();
     void ReadDataFiles();

@@ -1,6 +1,6 @@
 KALDI_ROOT ?= $(HOME)/kaldi
 CFLAGS := -g -O2 -DPIC -fPIC -Wno-unused-function
-CPPFLAGS := -I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/linux -I$(KALDI_ROOT)/src -I$(KALDI_ROOT)/tools/openfst/include -I../src
+CPPFLAGS := -I$(KALDI_ROOT)/src -I$(KALDI_ROOT)/tools/openfst/include -I../src
 
 KALDI_LIBS = \
              ${KALDI_ROOT}/src/online2/kaldi-online2.a \
@@ -24,10 +24,14 @@ KALDI_LIBS = \
              ${KALDI_ROOT}/tools/OpenBLAS/libopenblas.a \
              -lgfortran
 
-all: libvosk_jni.so
+all: libvosk.so
+	mkdir -p target/classes/org/kaldi/linux-x86_64
+	strip -g libvosk.so
+	cp libvosk.so target/classes/org/kaldi/linux-x86_64
+	chmod +x copy_dependencies.sh
+	./copy_dependencies.sh libvosk.so target/classes/org/kaldi/linux-x86_64
 
 VOSK_SOURCES = \
-	vosk_wrap.cc \
 	../src/kaldi_recognizer.cc \
 	../src/kaldi_recognizer.h \
 	../src/language_model.cc \
@@ -39,7 +43,7 @@ VOSK_SOURCES = \
 	../src/vosk_api.cc \
 	../src/vosk_api.h
 
-libvosk_jni.so: $(VOSK_SOURCES)
+libvosk.so: $(VOSK_SOURCES)
 	$(CXX) -shared -o $@ $(CPPFLAGS) $(CFLAGS) $(VOSK_SOURCES) $(KALDI_LIBS)
 
 vosk_wrap.cc: ../src/vosk.i

@@ -29,10 +29,10 @@ public:
     SpkModel(const char *spk_path);
     void Ref();
     void Unref();
+    ~SpkModel();
 
 protected:
     friend class KaldiRecognizer;
-    ~SpkModel() {};
 
     kaldi::nnet3::Nnet speaker_nnet;
     kaldi::Vector<BaseFloat> mean;
