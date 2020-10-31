@@ -16,17 +16,20 @@
     </properties>
 
     <dependencies>
+
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>org.bytedeco</groupId>
             <artifactId>javacpp</artifactId>
             <version>${javacpp.version}</version>
         </dependency>
+
         <dependency>
             <groupId>org.bytedeco</groupId>
             <artifactId>javacpp-platform</artifactId>
@@ -59,10 +62,6 @@
                             <goal>properties</goal>
                         </goals>
                     </execution>
-                    <!--
-                        puts the dependencies to the target/lib folder;
-                        we would need the javacpp-1.1.jar to build the java wrapper shared library
-                     -->
                     <execution>
                         <id>dependencies</id>
                         <goals>
@@ -75,35 +74,23 @@
                 </executions>
             </plugin>
 
-            <!--
-                everything (including dependencies) will be wrapped in a jar;
-                also indicate the main class to be executed my default
-             -->
-<!--            <plugin>-->
-<!--                <artifactId>maven-assembly-plugin</artifactId>-->
-<!--                <executions>-->
-<!--                    <execution>-->
-<!--                        <phase>package</phase>-->
-<!--                        <goals>-->
-<!--                            <goal>single</goal>-->
-<!--                        </goals>-->
-<!--                    </execution>-->
-<!--                </executions>-->
-<!--                <configuration>-->
-<!--                    <descriptorRefs>-->
-<!--                        <descriptorRef>jar-with-dependencies</descriptorRef>-->
-<!--                    </descriptorRefs>-->
-<!--                    <archive>-->
-<!--                        <manifest>-->
-<!--                            <mainClass>vosk</mainClass>-->
-<!--                        </manifest>-->
-<!--                    </archive>-->
-<!--                </configuration>-->
-<!--            </plugin>-->
-            <!--
-                specify where the libfoo.so is stored, after compile;
-                it is needed when the unit test is run
-             -->
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                </configuration>
+            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -127,8 +114,8 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>1.1</version>
-                <!-- this is how the shared library libfoo.so is built -->
                 <executions>
+
                     <execution>
                         <id>build-sharedlib</id>
                         <phase>process-classes</phase>
@@ -139,22 +126,22 @@
                             <executable>make</executable>
                             <commandlineArgs>all</commandlineArgs>
                             <workingDirectory>${basedir}</workingDirectory>
-                            <!--							<workingDirectory>/opt/kaldi/src</workingDirectory>-->
                         </configuration>
                     </execution>
-                    <!--					<execution>-->
-                    <!--						<id>clean-sharedlib</id>-->
-                    <!--						<phase>clean</phase>-->
-                    <!--						<goals>-->
-                    <!--							<goal>exec</goal>-->
-                    <!--						</goals>-->
-                    <!--						<configuration>-->
-                    <!--							<executable>make</executable>-->
-                    <!--							<commandlineArgs>clean</commandlineArgs>-->
-                    <!--							<workingDirectory>${basedir}/src/main/jni</workingDirectory>-->
-                    <!--						</configuration>-->
-                    <!--					</execution>-->
-                    <!-- in here we build the Java-based wrapper shared library -->
+
+                    <execution>
+                        <id>clean-sharedlib</id>
+                        <phase>clean</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>make</executable>
+                            <commandlineArgs>clean</commandlineArgs>
+                            <workingDirectory>${basedir}/</workingDirectory>
+                        </configuration>
+                    </execution>
+
                     <execution>
                         <id>build-jnilib</id>
                         <phase>process-classes</phase>
@@ -163,13 +150,6 @@
                         </goals>
                         <configuration>
                             <executable>java</executable>
-                            <!--
-                                -jar points to the javacpp.jar
-                                -Xcompiler may be followed by
-                                    -L specifies where the libfoo.so is
-                                    -I points to the foo.h header
-                                eu.atspace.hash.FooLib is the wrapper class
-                             -->
                             <arguments>
                                 <argument>-jar</argument>
                                 <argument>${project.build.directory}/lib/javacpp-${javacpp.version}.jar</argument>
@@ -188,14 +168,9 @@
                                 <argument>org.kaldi.KaldiRecognizer</argument>
                                 <argument>org.kaldi.Vosk</argument>
                             </arguments>
-<!--                            <commandlineArgs>-->
-<!--                                -jar ${project.build.directory}/lib/javacpp-${javacpp.version}.jar -Xcompiler -L${basedir}/target/classes/l2m/kaldi/javacpp/linux-x86_64 -Xcompiler -I${basedir}/../src -classpath target/classes l2m.kaldi.javacpp.Model l2m.kaldi.javacpp.SpkModel l2m.kaldi.javacpp.KaldiRecognizer l2m.kaldi.javacpp.Vosk-->
-<!--                            </commandlineArgs>-->
-                            <!--							<commandlineArgs>-->
-                            <!--								-jar ${project.build.directory}/lib/javacpp-${javacpp.version}.jar -Xcompiler -L${basedir}/target/classes/eu/atspace/hash/linux-x86_64 -Xcompiler -I${basedir}/src/main/jni -classpath target/classes eu.atspace.hash.FooLib-->
-                            <!--							</commandlineArgs>-->
                         </configuration>
                     </execution>
+
                 </executions>
             </plugin>
 
