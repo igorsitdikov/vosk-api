@@ -437,18 +437,20 @@ const char* KaldiRecognizer::GetResult()
     // Create JSON object
     for (int i = 0; i < size; i++) {
         json::JSON word;
-        word["word"] = model_->word_syms_->Find(words[i]);
-        word["start"] = samples_round_start_ / sample_frequency_ + (frame_offset_ + times[i].first) * 0.03;
-        word["end"] = samples_round_start_ / sample_frequency_ + (frame_offset_ + times[i].second) * 0.03;
+        word["data"]["note"] = model_->word_syms_->Find(words[i]);
+        word["start"] = (frame_offset_ + times[i].first) * 0.03;
+        word["end"] = (frame_offset_ + times[i].second) * 0.03;
         word["conf"] = conf[i];
-        obj["result"].append(word);
+        word["drag"] = false;
+        word["resize"] = false;
+        obj.append(word);
 
-        if (i) {
-            text << " ";
-        }
-        text << model_->word_syms_->Find(words[i]);
+//        if (i) {
+//            text << " ";
+//        }
+//        text << model_->word_syms_->Find(words[i]);
     }
-    obj["text"] = text.str();
+//    obj["text"] = text.str();
 
     if (spk_model_) {
         Vector<BaseFloat> xvector;

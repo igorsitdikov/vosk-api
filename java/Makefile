@@ -25,11 +25,11 @@ KALDI_LIBS = \
              -lgfortran
 
 all: libvosk.so
-	mkdir -p target/classes/org/kaldi/linux-x86_64
-	strip -g libvosk.so
-	cp libvosk.so target/classes/org/kaldi/linux-x86_64
-	chmod +x copy_dependencies.sh
-	./copy_dependencies.sh libvosk.so target/classes/org/kaldi/linux-x86_64
+# 	mkdir -p target/classes/org/kaldi/linux-x86_64
+# 	strip -g libvosk.so
+# 	cp libvosk.so target/classes/org/kaldi/linux-x86_64
+# 	chmod +x copy_dependencies.sh
+# 	./copy_dependencies.sh libvosk.so target/classes/org/kaldi/linux-x86_64
 
 VOSK_SOURCES = \
 	../src/kaldi_recognizer.cc \

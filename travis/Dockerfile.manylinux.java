@@ -37,13 +37,16 @@ RUN cd /opt \
 
 ARG MAVEN_VERSION=3.6.3
 
-RUN curl -O https://download.java.net/java/GA/jdk11/13/GPL/openjdk-11.0.1_linux-x64_bin.tar.gz && \
-    tar zxvf openjdk-11.0.1_linux-x64_bin.tar.gz && \
-    mv jdk-11.0.1 /usr/local/
+        #RUN curl -O https://download.java.net/java/GA/jdk11/13/GPL/openjdk-11.0.1_linux-x64_bin.tar.gz && \
+        #    tar zxvf openjdk-11.0.1_linux-x64_bin.tar.gz && \
+        #    mv jdk-11.0.1 /usr/local/
+        #
+        ## create new
+        #ENV JAVA_HOME /usr/local/jdk-11.0.1
+        #ENV PATH $JAVA_HOME/bin:$PATH
 
-# create new
-ENV JAVA_HOME /usr/local/jdk-11.0.1
-ENV PATH $JAVA_HOME/bin:$PATH
+RUN yum update && yum install -y \
+java-1.8.0-openjdk java-1.8.0-openjdk-devel
 
 # Changing user to root to install maven
 USER root

@@ -1,0 +1,129 @@
+apply plugin: 'java'
+apply plugin: 'maven'
+
+group = 'org.kaldi'
+version = '1.0.0-SNAPSHOT'
+
+description = """vosk"""
+
+sourceCompatibility = 8
+targetCompatibility = 8
+
+// Additional include and link directories needed to build the JNI
+def homePath = System.properties['user.home']
+def additionalIncludeDirs = ["${homePath}/kaldi/tools/openfst/include/", "${homePath}/kaldi/src/"]
+def additionalLinkDirs = []
+def javacpp = ["org.kaldi.Model", "org.kaldi.SpkModel", "org.kaldi.KaldiRecognizer", "org.kaldi.Vosk"]
+
+repositories {
+    jcenter()
+    mavenCentral()
+
+}
+
+jar {
+    baseName = 'vosk'
+    version = '1.0.0'
+}
+
+dependencies {
+    compile group: 'org.bytedeco', name: 'javacpp', version: '1.5.4'
+    compile group: 'org.bytedeco', name: 'javacpp-platform', version: '1.5.4'
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+}
+
+tasks.withType(Test) {
+    systemProperty "java.library.path", jarRootDir()
+}
+
+def libDir() {
+
+    def os
+
+    if (org.gradle.internal.os.OperatingSystem.current().isLinux()) {
+        os = "linux"
+    } else if (org.gradle.internal.os.OperatingSystem.current().isMacOsX()) {
+        os = "windows"
+    } else {
+        throw new UnsupportedOperationException("Unsupported operating sytem: " + org.gradle.internal.os.OperatingSystem.current().name)
+    }
+
+    return jarRootDir() + "/org/kaldi/" + os + "-x86_64/"
+}
+
+
+def generateJniArgs(additionalIncludeDirs, additionalLinkDirs, classpath, javaCppClass) {
+
+    def args = [
+            '-cp', classpath.join(":"),
+            "-d", libDir(),
+    ]
+
+    // include arguments
+    args.addAll "-Xcompiler", "-I${projectDir}/../src/"
+
+    additionalIncludeDirs.each { d ->
+        args.addAll "-Xcompiler", "-I${d}"
+    }
+
+    // linker arguments
+    args.addAll "-Xcompiler", "-L${libDir()}"
+
+    additionalLinkDirs.each { d ->
+        args.addAll "-Xcompiler", "-L${d}"
+    }
+
+    // javacpp class to generate code for
+    args.add javaCppClass
+
+    println args
+    return args as String[]
+}
+
+def generateJni(additionalIncludeDirs, additionalLinkDirs, javaCppClass) {
+    println "=== javacpp start: ${javaCppClass} ==="
+
+    javaexec {
+        main = 'org.bytedeco.javacpp.tools.Builder'
+        classpath sourceSets.main.output.classesDirs
+        classpath configurations.runtime
+        args generateJniArgs(additionalIncludeDirs, additionalLinkDirs, classpath, javaCppClass)
+    }
+
+    println "=== javacpp done: ${javaCppClass} ==="
+}
+
+def jarRootDir() {
+    return "${projectDir}/build/classes/java/main/"
+}
+
+compileJava.doLast {
+
+    exec {
+        commandLine 'make', '-f', 'Makefile'
+    }
+    exec {
+        commandLine './copy_dependencies.sh', 'libvosk.so', libDir()
+    }
+
+    copy {
+        from("${projectDir}/") {
+            include '*.so'
+            include '*.dylib'
+        }
+
+        into libDir()
+
+        // Flatten the hierarchy by setting the path
+        // of all files to their respective basename
+        // This gets rid of the directories containing the libs
+        eachFile {
+            path = name
+        }
+    }
+
+    javacpp.each { javaCppClass ->
+        generateJni(additionalIncludeDirs, additionalLinkDirs, javaCppClass)
+    }
+}
+
