@@ -1,180 +1,36 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>org.kaldi</groupId>
-    <artifactId>vosk</artifactId>
-    <packaging>jar</packaging>
-    <version>1.0.0-SNAPSHOT</version>
-    <name>vosk</name>
-    <url>http://maven.apache.org</url>
-
-    <properties>
-        <junit.version>4.11</junit.version>
-        <javacpp.version>1.5.4</javacpp.version>
-        <jdk.version>8</jdk.version>
-        <compiler.plugin.version>2.3.2</compiler.plugin.version>
-    </properties>
-
-    <dependencies>
-
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>${junit.version}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.bytedeco</groupId>
-            <artifactId>javacpp</artifactId>
-            <version>${javacpp.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.bytedeco</groupId>
-            <artifactId>javacpp-platform</artifactId>
-            <version>${javacpp.version}</version>
-        </dependency>
-
-    </dependencies>
-
-    <build>
-        <plugins>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>${compiler.plugin.version}</version>
-                <configuration>
-                    <source>${jdk.version}</source>
-                    <target>${jdk.version}</target>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <version>2.3</version>
-                <executions>
-                    <execution>
-                        <id>properties</id>
-                        <goals>
-                            <goal>properties</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>dependencies</id>
-                        <goals>
-                            <goal>copy-dependencies</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${project.build.directory}/lib</outputDirectory>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.18</version>
-                <configuration>
-                    <skipTests>false</skipTests>
-                    <forkMode>once</forkMode>
-                    <environmentVariables>
-                        <LD_LIBRARY_PATH>target/classes/linux-x86_64</LD_LIBRARY_PATH>
-                    </environmentVariables>
-                    <systemProperties>
-                        <property>
-                            <name>java.library.tmpdir</name>
-                            <value>target/classes/linux-x86_64</value>
-                        </property>
-                    </systemProperties>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>1.1</version>
-                <executions>
-
-                    <execution>
-                        <id>build-sharedlib</id>
-                        <phase>process-classes</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <executable>make</executable>
-                            <commandlineArgs>all</commandlineArgs>
-                            <workingDirectory>${basedir}</workingDirectory>
-                        </configuration>
-                    </execution>
-
-                    <execution>
-                        <id>clean-sharedlib</id>
-                        <phase>clean</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <executable>make</executable>
-                            <commandlineArgs>clean</commandlineArgs>
-                            <workingDirectory>${basedir}/</workingDirectory>
-                        </configuration>
-                    </execution>
-
-                    <execution>
-                        <id>build-jnilib</id>
-                        <phase>process-classes</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <executable>java</executable>
-                            <arguments>
-                                <argument>-jar</argument>
-                                <argument>${project.build.directory}/lib/javacpp-${javacpp.version}.jar</argument>
-                                <argument>-Xcompiler</argument>
-                                <argument>-L${basedir}/target/classes/org/kaldi/linux-x86_64</argument>
-                                <argument>-Xcompiler</argument>
-                                <argument>-I${user.home}/kaldi/tools/openfst/include</argument>
-                                <argument>-Xcompiler</argument>
-                                <argument>-I${basedir}/../src</argument>
-                                <argument>-Xcompiler</argument>
-                                <argument>-I${user.home}/kaldi/src</argument>
-                                <argument>-classpath</argument>
-                                <argument>target/classes</argument>
-                                <argument>org.kaldi.Model</argument>
-                                <argument>org.kaldi.SpkModel</argument>
-                                <argument>org.kaldi.KaldiRecognizer</argument>
-                                <argument>org.kaldi.Vosk</argument>
-                            </arguments>
-                        </configuration>
-                    </execution>
-
-                </executions>
-            </plugin>
-
-        </plugins>
-
-    </build>
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.alphacep</groupId>
+  <artifactId>vosk-java</artifactId>
+  <version>0.3.15</version>
+  <inceptionYear>2020</inceptionYear>
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>https://github.com/alphacep/vosk-api</distribution>
+    </license>
+  </licenses>
+  <dependencies>
+    <dependency>
+      <groupId>org.bytedeco</groupId>
+      <artifactId>javacpp</artifactId>
+      <version>1.5.4</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.bytedeco</groupId>
+      <artifactId>javacpp-platform</artifactId>
+      <version>1.5.4</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.11</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
 </project>

@@ -4,6 +4,9 @@ apply plugin: 'maven'
 group = 'org.kaldi'
 version = '1.0.0-SNAPSHOT'
 
+def archiveName = "vosk-java"
+def libVersion = "0.3.15"
+
 description = """vosk"""
 
 sourceCompatibility = 8
@@ -18,12 +21,11 @@ def javacpp = ["org.kaldi.Model", "org.kaldi.SpkModel", "org.kaldi.KaldiRecogniz
 repositories {
     jcenter()
     mavenCentral()
-
 }
 
 jar {
-    baseName = 'vosk'
-    version = '1.0.0'
+    baseName = archiveName
+    version = libVersion
 }
 
 dependencies {
@@ -42,7 +44,7 @@ def libDir() {
 
     if (org.gradle.internal.os.OperatingSystem.current().isLinux()) {
         os = "linux"
-    } else if (org.gradle.internal.os.OperatingSystem.current().isMacOsX()) {
+    } else if (org.gradle.internal.os.OperatingSystem.current().isWindows()) {
         os = "windows"
     } else {
         throw new UnsupportedOperationException("Unsupported operating sytem: " + org.gradle.internal.os.OperatingSystem.current().name)
@@ -100,8 +102,9 @@ def jarRootDir() {
 compileJava.doLast {
 
     exec {
-        commandLine 'make', '-f', 'Makefile'
+        commandLine 'make'
     }
+
     exec {
         commandLine './copy_dependencies.sh', 'libvosk.so', libDir()
     }
@@ -109,7 +112,7 @@ compileJava.doLast {
     copy {
         from("${projectDir}/") {
             include '*.so'
-            include '*.dylib'
+            include '*.dll'
         }
 
         into libDir()
@@ -125,5 +128,24 @@ compileJava.doLast {
     javacpp.each { javaCppClass ->
         generateJni(additionalIncludeDirs, additionalLinkDirs, javaCppClass)
     }
-}
 
+}
+task writeNewPom {
+    doLast {
+        pom {
+            project {
+                groupId 'com.alphacep'
+                artifactId archiveName
+                version libVersion
+                inceptionYear '2020'
+                licenses {
+                    license {
+                        name 'The Apache Software License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        distribution 'https://github.com/alphacep/vosk-api'
+                    }
+                }
+            }
+        }.writeTo("pom.xml")
+    }
+}
