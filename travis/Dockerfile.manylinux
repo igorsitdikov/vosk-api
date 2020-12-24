@@ -34,3 +34,42 @@ RUN cd /opt \
     && ./configure --mathlib=OPENBLAS --shared --use-cuda=no \
     && make -j 10 online2 lm rnnlm \
     && find /opt/kaldi -name "*.o" -exec rm {} \;
+make online2 lm rnnlm
+RUN yum update && yum install -y \
+    java-1.8.0-openjdk
+
+ARG MAVEN_VERSION=3.6.3
+ENV JAVA_VERSON 11.0.6
+
+RUN curl -O https://download.java.net/java/GA/jdk11/13/GPL/openjdk-11.0.1_linux-x64_bin.tar.gz && \
+    tar zxvf openjdk-11.0.1_linux-x64_bin.tar.gz && \
+    mv jdk-11.0.1 /usr/local/
+
+# create new
+ENV JAVA_HOME /usr/local/jdk-11.0.1
+ENV PATH $JAVA_HOME/bin:$PATH
+
+
+# Changing user to root to install maven
+USER root
+
+# Install required tools
+# which: otherwise 'mvn version' prints '/usr/share/maven/bin/mvn: line 93: which: command not found'
+RUN yum update -y && \
+  yum install -y which && \
+  yum clean all
+
+# Maven
+RUN curl -fsSL https://archive.apache.org/dist/maven/maven-3/$MAVEN_VERSION/binaries/apache-maven-$MAVEN_VERSION-bin.tar.gz | tar xzf - -C /usr/share \
+  && mv /usr/share/apache-maven-$MAVEN_VERSION /usr/share/maven \
+  && ln -s /usr/share/maven/bin/mvn /usr/bin/mvn
+
+ENV MAVEN_VERSION=${MAVEN_VERSION}
+ENV M2_HOME /usr/share/maven
+ENV maven.home $M2_HOME
+ENV M2 $M2_HOME/bin
+ENV PATH $M2:$PATH
+RUN java -version
+RUN mkdir /recipies
+
+WORKDIR /recipies/

@@ -173,9 +173,9 @@ void KaldiRecognizer::InitRescoring()
 {
     if (model_->std_lm_fst_) {
         fst::CacheOptions cache_opts(true, 50000);
-        fst::MapFstOptions mapfst_opts(cache_opts);
+        fst::ArcMapFstOptions mapfst_opts(cache_opts);
         fst::StdToLatticeMapper<kaldi::BaseFloat> mapper;
-        lm_fst_ = new fst::MapFst<fst::StdArc, kaldi::LatticeArc, fst::StdToLatticeMapper<kaldi::BaseFloat> >(*model_->std_lm_fst_, mapper, mapfst_opts);
+        lm_fst_ = new fst::ArcMapFst<fst::StdArc, kaldi::LatticeArc, fst::StdToLatticeMapper<kaldi::BaseFloat> >(*model_->std_lm_fst_, mapper, mapfst_opts);
     } else {
         lm_fst_ = NULL;
     }
@@ -437,20 +437,18 @@ const char* KaldiRecognizer::GetResult()
     // Create JSON object
     for (int i = 0; i < size; i++) {
         json::JSON word;
-        word["data"]["note"] = model_->word_syms_->Find(words[i]);
-        word["start"] = (frame_offset_ + times[i].first) * 0.03;
-        word["end"] = (frame_offset_ + times[i].second) * 0.03;
+        word["word"] = model_->word_syms_->Find(words[i]);
+        word["start"] = samples_round_start_ / sample_frequency_ + (frame_offset_ + times[i].first) * 0.03;
+        word["end"] = samples_round_start_ / sample_frequency_ + (frame_offset_ + times[i].second) * 0.03;
         word["conf"] = conf[i];
-        word["drag"] = false;
-        word["resize"] = false;
-        obj.append(word);
+        obj["result"].append(word);
 
-//        if (i) {
-//            text << " ";
-//        }
-//        text << model_->word_syms_->Find(words[i]);
+        if (i) {
+            text << " ";
+        }
+        text << model_->word_syms_->Find(words[i]);
     }
-//    obj["text"] = text.str();
+    obj["text"] = text.str();
 
     if (spk_model_) {
         Vector<BaseFloat> xvector;

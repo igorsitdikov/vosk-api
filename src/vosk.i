@@ -36,7 +36,10 @@ import java.nio.ByteOrder;
 %}
 %pragma(java) jniclasscode=%{
     static {
-        System.loadLibrary("vosk_jni");
+        NativeLoader na = new NativeLoader();
+        na.loadLibrary("quadmath");
+        na.loadLibrary("gfortran");
+        na.loadLibrary("vosk_jni");
     }
 %}
 #endif

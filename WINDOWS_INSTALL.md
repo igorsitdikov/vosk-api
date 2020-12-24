@@ -72,7 +72,6 @@
         mv src/extensions/ngram/.libs/* lib/ 
    
         ./configure --mingw=/mingw --static --openblas-root=../tools/OpenBLAS --fst-root=../tools/openfst/ --use-cuda=no && \
-        
         make
     ```
 1. optional
