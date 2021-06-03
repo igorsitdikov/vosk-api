@@ -90,10 +90,10 @@ VoskRecognizer *vosk_recognizer_new(VoskModel *model, float sample_rate);
  *  With the speaker recognition mode the recognizer not just recognize
  *  text but also return speaker vectors one can use for speaker identification
  *
- *  @param spk_model speaker model for speaker identification
  *  @param sample_rate The sample rate of the audio you going to feed into the recognizer
+ *  @param spk_model speaker model for speaker identification
  *  @returns recognizer object */
-VoskRecognizer *vosk_recognizer_new_spk(VoskModel *model, VoskSpkModel *spk_model, float sample_rate);
+VoskRecognizer *vosk_recognizer_new_spk(VoskModel *model, float sample_rate, VoskSpkModel *spk_model);
 
 
 /** Creates the recognizer object with the phrase list
@@ -113,6 +113,30 @@ VoskRecognizer *vosk_recognizer_new_spk(VoskModel *model, VoskSpkModel *spk_mode
  *  @returns recognizer object */
 VoskRecognizer *vosk_recognizer_new_grm(VoskModel *model, float sample_rate, const char *grammar);
 
+
+/** Adds speaker model to already initialized recognizer
+ *
+ * Can add speaker recognition model to already created recognizer. Helps to initialize
+ * speaker recognition for grammar-based recognizer.
+ *
+ * @param spk_model Speaker recognition model */
+void vosk_recognizer_set_spk_model(VoskRecognizer *recognizer, VoskSpkModel *spk_model);
+
+
+/** Configures recognizer to output n-best results
+ *
+ * <pre>
+ *   {
+ *      "alternatives": [
+ *          { "text": "one two three four five", "confidence": 0.97 },
+ *          { "text": "one two three for five", "confidence": 0.03 },
+ *      ]
+ *   }
+ * </pre>
+ *
+ * @param max_alternatives - maximum alternatives to return from recognition results
+ */
+void vosk_recognizer_set_max_alternatives(VoskRecognizer *recognizer, int max_alternatives);
 
 /** Accept voice data
  *
@@ -171,6 +195,8 @@ int vosk_recognizer_accept_waveform_f(VoskRecognizer *recognizer, const float *d
  *   "text" : "what zero zero zero one"
  *  }
  * </pre>
+ *
+ * If alternatives enabled it returns result with alternatives, see also vosk_recognizer_set_alternatives().
  */
 const char *vosk_recognizer_result(VoskRecognizer *recognizer);
 
@@ -196,6 +222,12 @@ const char *vosk_recognizer_partial_result(VoskRecognizer *recognizer);
  *  @returns speech result in JSON format.
  */
 const char *vosk_recognizer_final_result(VoskRecognizer *recognizer);
+
+
+/** Resets the recognizer
+ *
+ *  Resets current results so the recognition can continue from scratch */
+void vosk_recognizer_reset(VoskRecognizer *recognizer);
 
 
 /** Releases recognizer object

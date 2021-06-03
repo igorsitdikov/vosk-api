@@ -8,6 +8,7 @@ public class VoskDemo
    {
         // Demo byte buffer
         VoskRecognizer rec = new VoskRecognizer(model, 16000.0f);
+        rec.SetMaxAlternatives(0);
         using(Stream source = File.OpenRead("test.wav")) {
             byte[] buffer = new byte[4096];
             int bytesRead;
@@ -48,7 +49,8 @@ public class VoskDemo
    {
         // Output speakers
         SpkModel spkModel = new SpkModel("model-spk");
-        VoskRecognizer rec = new VoskRecognizer(model, spkModel, 16000.0f);
+        VoskRecognizer rec = new VoskRecognizer(model, 16000.0f);
+        rec.SetSpkModel(spkModel);
 
         using(Stream source = File.OpenRead("test.wav")) {
             byte[] buffer = new byte[4096];

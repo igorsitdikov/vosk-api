@@ -69,6 +69,11 @@ const vosk_recognizer_ptr = ref.refType(vosk_recognizer);
 
 let soname;
 if (os.platform() == 'win32') {
+    // Update path to load dependent dlls
+    let currentPath = process.env.Path;
+    let dllDirectory = path.resolve(path.join(__dirname, "lib", "win-x86_64"));
+    process.env.Path = currentPath + path.delimiter + dllDirectory;
+
     soname = path.join(__dirname, "lib", "win-x86_64", "libvosk.dll")
 } else if (os.platform() == 'darwin') {
     soname = path.join(__dirname, "lib", "osx-x86_64", "libvosk.dylib")
@@ -83,13 +88,16 @@ const libvosk = ffi.Library(soname, {
     'vosk_spk_model_new': [vosk_spk_model_ptr, ['string']],
     'vosk_spk_model_free': ['void', [vosk_spk_model_ptr]],
     'vosk_recognizer_new': [vosk_recognizer_ptr, [vosk_model_ptr, 'float']],
-    'vosk_recognizer_new_spk': [vosk_recognizer_ptr, [vosk_model_ptr, vosk_spk_model_ptr, 'float']],
+    'vosk_recognizer_new_spk': [vosk_recognizer_ptr, [vosk_model_ptr, 'float', vosk_spk_model_ptr]],
     'vosk_recognizer_new_grm': [vosk_recognizer_ptr, [vosk_model_ptr, 'float', 'string']],
     'vosk_recognizer_free': ['void', [vosk_recognizer_ptr]],
+    'vosk_recognizer_set_max_alternatives': ['void', [vosk_recognizer_ptr, 'int']],
+    'vosk_recognizer_set_spk_model': ['void', [vosk_recognizer_ptr, vosk_spk_model_ptr]],
     'vosk_recognizer_accept_waveform': ['bool', [vosk_recognizer_ptr, 'pointer', 'int']],
     'vosk_recognizer_result': ['string', [vosk_recognizer_ptr]],
     'vosk_recognizer_final_result': ['string', [vosk_recognizer_ptr]],
     'vosk_recognizer_partial_result': ['string', [vosk_recognizer_ptr]],
+    'vosk_recognizer_reset': ['void', [vosk_recognizer_ptr]],
 });
 
 /**
@@ -221,7 +229,7 @@ class Recognizer {
          * @type {unknown}
          */
         this.handle = hasOwnProperty(param, 'speakerModel')
-            ? libvosk.vosk_recognizer_new_spk(model.handle, param.speakerModel, sampleRate)
+            ? libvosk.vosk_recognizer_new_spk(model.handle, sampleRate, param.speakerModel.handle)
             : hasOwnProperty(param, 'grammar')
                 ? libvosk.vosk_recognizer_new_grm(model.handle, sampleRate, JSON.stringify(param.grammar))
                 : libvosk.vosk_recognizer_new(model.handle, sampleRate);
@@ -238,6 +246,32 @@ class Recognizer {
         libvosk.vosk_recognizer_free(this.handle);
     }
 
+    /** Configures recognizer to output n-best results
+     *
+     * <pre>
+     *   {
+     *      "alternatives": [
+     *          { "text": "one two three four five", "confidence": 0.97 },
+     *          { "text": "one two three for five", "confidence": 0.03 },
+     *      ]
+     *   }
+     * </pre>
+     *
+     * @param max_alternatives - maximum alternatives to return from recognition results
+     */
+    setMaxAlternatives(max_alternatives) {
+        libvosk.vosk_recognizer_set_max_alternatives(this.handle, max_alternatives);
+    }
+
+    /** Adds speaker recognition model to already created recognizer. Helps to initialize
+     * speaker recognition for grammar-based recognizer.
+     *
+     * @param spk_model Speaker recognition model
+     */
+    setSpkModel(spk_model) {
+        libvosk.vosk_recognizer_set_spk_model(this.handle, spk_model.handle);
+    }
+
     /** 
      * Accept voice data
      *
@@ -248,6 +282,26 @@ class Recognizer {
      */
     acceptWaveform(data) {
         return libvosk.vosk_recognizer_accept_waveform(this.handle, data, data.length);
+    };
+
+    /** 
+     * Accept voice data
+     *
+     * accept and process new chunk of voice data
+     *
+     * @param {Buffer} data audio data in PCM 16-bit mono format
+     * @returns true if silence is occured and you can retrieve a new utterance with result method
+     */
+    acceptWaveformAsync(data) {
+        return new Promise((resolve, reject) => {
+            libvosk.vosk_recognizer_accept_waveform.async(this.handle, data, data.length, function(err, result) {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(result);
+                }
+            });
+        });
     };
 
     /** Returns speech recognition result in a string
@@ -309,7 +363,7 @@ class Recognizer {
         return JSON.parse(libvosk.vosk_recognizer_partial_result(this.handle));
     };
 
-    /** 
+    /**
      * Returns speech recognition result. Same as result, but doesn't wait for silence
      * You usually call it in the end of the stream to get final bits of audio. It
      * flushes the feature pipeline, so all remaining audio chunks got processed.
@@ -319,6 +373,14 @@ class Recognizer {
     finalResult() {
         return JSON.parse(libvosk.vosk_recognizer_final_result(this.handle));
     };
+
+    /**
+     *
+     * Resets current results so the recognition can continue from scratch 
+     */
+    reset() {
+        libvosk.vosk_recognizer_reset(this.handle);
+    }
 }
 
 exports.setLogLevel = setLogLevel
