@@ -14,31 +14,12 @@
 
 #include "vosk_api.h"
 #include "kaldi_recognizer.h"
-#include "model.h"
 #include "spk_model.h"
-
-#if HAVE_CUDA
-#include "cudamatrix/cu-device.h"
-#endif
 
 #include <string.h>
 
 using namespace kaldi;
 
-VoskModel *vosk_model_new(const char *model_path)
-{
-    return (VoskModel *)new Model(model_path);
-}
-
-void vosk_model_free(VoskModel *model)
-{
-    ((Model *)model)->Unref();
-}
-
-int vosk_model_find_word(VoskModel *model, const char *word)
-{
-    return (int) ((Model *)model)->FindWord(word);
-}
 
 VoskSpkModel *vosk_spk_model_new(const char *model_path)
 {
@@ -50,29 +31,9 @@ void vosk_spk_model_free(VoskSpkModel *model)
     ((SpkModel *)model)->Unref();
 }
 
-VoskRecognizer *vosk_recognizer_new(VoskModel *model, float sample_rate)
-{
-    return (VoskRecognizer *)new KaldiRecognizer((Model *)model, sample_rate);
-}
-
-VoskRecognizer *vosk_recognizer_new_spk(VoskModel *model, float sample_rate, VoskSpkModel *spk_model)
+VoskRecognizer *vosk_recognizer_new_spk(float sample_rate, VoskSpkModel *spk_model)
 {
     return (VoskRecognizer *)new KaldiRecognizer((Model *)model, sample_rate, (SpkModel *)spk_model);
-}
-
-VoskRecognizer *vosk_recognizer_new_grm(VoskModel *model, float sample_rate, const char *grammar)
-{
-    return (VoskRecognizer *)new KaldiRecognizer((Model *)model, sample_rate, grammar);
-}
-
-void vosk_recognizer_set_max_alternatives(VoskRecognizer *recognizer, int max_alternatives)
-{
-    ((KaldiRecognizer *)recognizer)->SetMaxAlternatives(max_alternatives);
-}
-
-void vosk_recognizer_set_spk_model(VoskRecognizer *recognizer, VoskSpkModel *spk_model)
-{
-    ((KaldiRecognizer *)recognizer)->SetSpkModel((SpkModel *)spk_model);
 }
 
 int vosk_recognizer_accept_waveform(VoskRecognizer *recognizer, const char *data, int length)
@@ -90,24 +51,9 @@ int vosk_recognizer_accept_waveform_f(VoskRecognizer *recognizer, const float *d
     return ((KaldiRecognizer *)(recognizer))->AcceptWaveform(data, length);
 }
 
-const char *vosk_recognizer_result(VoskRecognizer *recognizer)
-{
-    return ((KaldiRecognizer *)recognizer)->Result();
-}
-
-const char *vosk_recognizer_partial_result(VoskRecognizer *recognizer)
-{
-    return ((KaldiRecognizer *)recognizer)->PartialResult();
-}
-
 const char *vosk_recognizer_final_result(VoskRecognizer *recognizer)
 {
     return ((KaldiRecognizer *)recognizer)->FinalResult();
-}
-
-void vosk_recognizer_reset(VoskRecognizer *recognizer)
-{
-    ((KaldiRecognizer *)recognizer)->Reset();
 }
 
 void vosk_recognizer_free(VoskRecognizer *recognizer)
@@ -118,19 +64,4 @@ void vosk_recognizer_free(VoskRecognizer *recognizer)
 void vosk_set_log_level(int log_level)
 {
     SetVerboseLevel(log_level);
-}
-
-void vosk_gpu_init()
-{
-#if HAVE_CUDA
-    kaldi::CuDevice::Instantiate().SelectGpuId("yes");
-    kaldi::CuDevice::Instantiate().AllowMultithreading();
-#endif
-}
-
-void vosk_gpu_thread_init()
-{
-#if HAVE_CUDA
-    kaldi::CuDevice::Instantiate();
-#endif
 }

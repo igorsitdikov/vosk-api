@@ -28,7 +28,6 @@
 #include "nnet3/nnet-am-decodable-simple.h"
 #include "nnet3/nnet-utils.h"
 
-#include "model.h"
 #include "spk_model.h"
 
 using namespace kaldi;
@@ -42,12 +41,8 @@ enum KaldiRecognizerState {
 
 class KaldiRecognizer {
     public:
-        KaldiRecognizer(Model *model, float sample_frequency);
-        KaldiRecognizer(Model *model, float sample_frequency, SpkModel *spk_model);
-        KaldiRecognizer(Model *model, float sample_frequency, char const *grammar);
+        KaldiRecognizer(float sample_frequency, SpkModel *spk_model);
         ~KaldiRecognizer();
-        void SetMaxAlternatives(int max_alternatives);
-        void SetSpkModel(SpkModel *spk_model);
         bool AcceptWaveform(const char *data, int len);
         bool AcceptWaveform(const short *sdata, int len);
         bool AcceptWaveform(const float *fdata, int len);

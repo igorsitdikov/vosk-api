@@ -12,8 +12,6 @@ EXTRA_LDFLAGS?=
 
 VOSK_SOURCES= \
 	kaldi_recognizer.cc \
-	language_model.cc \
-	model.cc \
 	spk_model.cc \
 	vosk_api.cc
 
