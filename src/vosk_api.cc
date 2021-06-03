@@ -33,7 +33,7 @@ void vosk_spk_model_free(VoskSpkModel *model)
 
 VoskRecognizer *vosk_recognizer_new_spk(float sample_rate, VoskSpkModel *spk_model)
 {
-    return (VoskRecognizer *)new KaldiRecognizer((Model *)model, sample_rate, (SpkModel *)spk_model);
+    return (VoskRecognizer *)new KaldiRecognizer(sample_rate, (SpkModel *)spk_model);
 }
 
 int vosk_recognizer_accept_waveform(VoskRecognizer *recognizer, const char *data, int length)
