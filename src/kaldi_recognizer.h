@@ -46,30 +46,15 @@ class KaldiRecognizer {
         bool AcceptWaveform(const char *data, int len);
         bool AcceptWaveform(const short *sdata, int len);
         bool AcceptWaveform(const float *fdata, int len);
-        const char* Result();
         const char* FinalResult();
-        const char* PartialResult();
-        void Reset();
 
     private:
-        void InitState();
-        void InitRescoring();
-        void CleanUp();
-        void UpdateSilenceWeights();
         bool AcceptWaveform(Vector<BaseFloat> &wdata);
         bool GetSpkVector(Vector<BaseFloat> &out_xvector, int *frames);
-        const char *GetResult();
         const char *StoreEmptyReturn();
         const char *StoreReturn(const string &res);
-        const char *MbrResult(CompactLattice &clat);
-        const char *NbestResult(CompactLattice &clat);
+        const char *MbrResult();
 
-        Model *model_ = nullptr;
-        SingleUtteranceNnet3Decoder *decoder_ = nullptr;
-        fst::LookaheadFst<fst::StdArc, int32> *decode_fst_ = nullptr;
-        fst::StdVectorFst *g_fst_ = nullptr; // dynamically constructed grammar
-        OnlineNnet2FeaturePipeline *feature_pipeline_ = nullptr;
-        OnlineSilenceWeighting *silence_weighting_ = nullptr;
 
         // Speaker identification
         SpkModel *spk_model_ = nullptr;

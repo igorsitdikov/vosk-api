@@ -16,7 +16,6 @@
 #include "json.h"
 #include "fstext/fstext-utils.h"
 #include "lat/sausages.h"
-#include "language_model.h"
 
 using namespace fst;
 using namespace kaldi::nnet3;
@@ -224,13 +223,6 @@ const char* KaldiRecognizer::FinalResult()
     spk_feature_ = nullptr;
 
     return last_result_.c_str();
-}
-
-void KaldiRecognizer::Reset()
-{
-    decoder_->FinalizeDecoding();
-    StoreEmptyReturn();
-    state_ = RECOGNIZER_ENDPOINT;
 }
 
 // Store result in recognizer and return as const string
