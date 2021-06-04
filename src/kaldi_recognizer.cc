@@ -104,7 +104,7 @@ bool KaldiRecognizer::GetSpkVector(Vector<BaseFloat> &out_xvector, int *num_spk_
 
     int num_frames = spk_feature_->NumFramesReady() - frame_offset_ * 3;
     Matrix<BaseFloat> mfcc(num_frames, spk_feature_->Dim());
-    KALDI_LOG << mfcc;
+//    KALDI_LOG << mfcc;
     // Not very efficient, would be nice to have faster search
     int num_nonsilence_frames = 0;
     Vector<BaseFloat> feat(spk_feature_->Dim());
@@ -119,9 +119,9 @@ bool KaldiRecognizer::GetSpkVector(Vector<BaseFloat> &out_xvector, int *num_spk_
        mfcc.CopyRowFromVec(feat, num_nonsilence_frames);
        num_nonsilence_frames++;
     }
-    KALDI_LOG << mfcc;
+//    KALDI_LOG << mfcc;
     *num_spk_frames = num_nonsilence_frames;
-    KALDI_LOG << num_nonsilence_frames;
+//    KALDI_LOG << num_nonsilence_frames;
     // Don't extract vector if not enough data
     if (num_nonsilence_frames < MIN_SPK_FEATS) {
         return false;
@@ -168,10 +168,10 @@ const char *KaldiRecognizer::MbrResult()
         int num_spk_frames;
         if (GetSpkVector(xvector, &num_spk_frames)) {
             for (int i = 0; i < xvector.Dim(); i++) {
-                KALDI_LOG << xvector(i);
+//                KALDI_LOG << xvector(i);
               obj["spk"].append(xvector(i));
             }
-            KALDI_LOG << num_spk_frames;
+//            KALDI_LOG << num_spk_frames;
             obj["spk_frames"] = num_spk_frames;
         }
     }
