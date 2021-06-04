@@ -32,7 +32,7 @@ class KaldiRecognizer(object):
 
     def __init__(self, *args):
         if len(args) == 2:
-            self._handle = _c.vosk_recognizer_new_spk(args[0]._handle, args[1])
+            self._handle = _c.vosk_recognizer_new_spk(args[0], args[1]._handle)
         else:
             raise TypeError("Unknown arguments")
 
