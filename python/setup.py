@@ -11,7 +11,7 @@ system = os.environ.get('SID_PLATFORM', platform.system())
 architecture = os.environ.get('SID_ARCHITECTURE', platform.architecture()[0])
 
 # Copy precompmilled libraries
-for lib in glob.glob(os.path.join(vosk_source, "src/lib*.*")):
+for lib in glob.glob(os.path.join(sid_source, "src/lib*.*")):
     print ("Adding library", lib)
     shutil.copy(lib, "sid")
 
