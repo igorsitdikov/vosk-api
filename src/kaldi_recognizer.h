@@ -63,13 +63,6 @@ class KaldiRecognizer {
         // Rescoring
         fst::ArcMapFst<fst::StdArc, kaldi::LatticeArc, fst::StdToLatticeMapper<kaldi::BaseFloat> > *lm_fst_ = nullptr;
 
-        // RNNLM rescoring
-        kaldi::rnnlm::RnnlmComputeStateInfo *info = nullptr;
-        fst::ScaleDeterministicOnDemandFst *lm_to_subtract_det_scale = nullptr;
-        fst::BackoffDeterministicOnDemandFst<fst::StdArc> *lm_to_subtract_det_backoff = nullptr;
-        kaldi::rnnlm::KaldiRnnlmDeterministicFst* lm_to_add_orig = nullptr;
-        fst::DeterministicOnDemandFst<fst::StdArc> *lm_to_add = nullptr;
-
         int max_alternatives_ = 0; // Disable alternatives by default
 
         float sample_frequency_;

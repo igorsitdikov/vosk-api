@@ -20,14 +20,11 @@
 using namespace fst;
 using namespace kaldi::nnet3;
 
-KaldiRecognizer::KaldiRecognizer(float sample_frequency, SpkModel *spk_model) : model_(model), spk_model_(spk_model), sample_frequency_(sample_frequency) {
+KaldiRecognizer::KaldiRecognizer(float sample_frequency, SpkModel *spk_model) : spk_model_(spk_model), sample_frequency_(sample_frequency) {
 
     spk_model->Ref();
 
     spk_feature_ = new OnlineMfcc(spk_model_->spkvector_mfcc_opts);
-
-    InitState();
-    InitRescoring();
 }
 
 KaldiRecognizer::~KaldiRecognizer() {
@@ -64,18 +61,12 @@ bool KaldiRecognizer::AcceptWaveform(const float *fdata, int len)
 
 bool KaldiRecognizer::AcceptWaveform(Vector<BaseFloat> &wdata)
 {
-    // Cleanup if we finalized previous utterance or the whole feature pipeline
-    if (!(state_ == RECOGNIZER_RUNNING || state_ == RECOGNIZER_INITIALIZED)) {
-        CleanUp();
-    }
     state_ = RECOGNIZER_RUNNING;
 
     int step = static_cast<int>(sample_frequency_ * 0.2);
     for (int i = 0; i < wdata.Dim(); i+= step) {
         SubVector<BaseFloat> r = wdata.Range(i, std::min(step, wdata.Dim() - i));
         feature_pipeline_->AcceptWaveform(sample_frequency_, r);
-        UpdateSilenceWeights();
-        decoder_->AdvanceDecoding();
     }
     samples_processed_ += wdata.Dim();
 
@@ -212,14 +203,8 @@ const char* KaldiRecognizer::FinalResult()
 
     // Free some memory while we are finalized, next
     // iteration will reinitialize them anyway
-    delete decoder_;
-    delete feature_pipeline_;
-    delete silence_weighting_;
     delete spk_feature_;
 
-    feature_pipeline_ = nullptr;
-    silence_weighting_ = nullptr;
-    decoder_ = nullptr;
     spk_feature_ = nullptr;
 
     return last_result_.c_str();
