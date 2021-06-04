@@ -27,6 +27,7 @@
 #include "spk_model.h"
 
 using namespace kaldi;
+using namespace std;
 
 enum KaldiRecognizerState {
     RECOGNIZER_INITIALIZED,
