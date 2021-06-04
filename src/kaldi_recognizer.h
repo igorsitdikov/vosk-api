@@ -38,7 +38,7 @@ enum KaldiRecognizerState {
 
 class KaldiRecognizer {
 public:
-    KaldiRecognizer(SpkModel *spk_model, float sample_frequency);
+    KaldiRecognizer(float sample_frequency, SpkModel *spk_model);
     ~KaldiRecognizer();
     bool AcceptWaveform(const char *data, int len);
     bool AcceptWaveform(const short *sdata, int len);
@@ -48,6 +48,8 @@ public:
 private:
     void CleanUp();
     void UpdateSilenceWeights();
+    const char *StoreEmptyReturn();
+    const char *MbrResult();
     bool AcceptWaveform(Vector<BaseFloat> &wdata);
     bool GetSpkVector(Vector<BaseFloat> &xvector, int *frames);
     const char *GetResult();
