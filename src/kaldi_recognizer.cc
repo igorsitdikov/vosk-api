@@ -33,7 +33,7 @@ KaldiRecognizer::~KaldiRecognizer() {
          delete spk_feature_;
 }
 
-bool KaldiRecognizer::AcceptWaveform(const char *data, int len)
+void KaldiRecognizer::AcceptWaveform(const char *data, int len)
 {
     Vector<BaseFloat> wave;
     wave.Resize(len / 2, kUndefined);
@@ -42,31 +42,29 @@ bool KaldiRecognizer::AcceptWaveform(const char *data, int len)
     return AcceptWaveform(wave);
 }
 
-bool KaldiRecognizer::AcceptWaveform(const short *sdata, int len)
+void KaldiRecognizer::AcceptWaveform(const short *sdata, int len)
 {
     Vector<BaseFloat> wave;
     wave.Resize(len, kUndefined);
     for (int i = 0; i < len; i++)
         wave(i) = sdata[i];
-    return AcceptWaveform(wave);
+    AcceptWaveform(wave);
 }
 
-bool KaldiRecognizer::AcceptWaveform(const float *fdata, int len)
+void KaldiRecognizer::AcceptWaveform(const float *fdata, int len)
 {
     Vector<BaseFloat> wave;
     wave.Resize(len, kUndefined);
     for (int i = 0; i < len; i++)
         wave(i) = fdata[i];
-    return AcceptWaveform(wave);
+    AcceptWaveform(wave);
 }
 
-bool KaldiRecognizer::AcceptWaveform(Vector<BaseFloat> &wdata)
+void KaldiRecognizer::AcceptWaveform(Vector<BaseFloat> &wdata)
 {
     state_ = RECOGNIZER_RUNNING;
 
     spk_feature_->AcceptWaveform(sample_frequency_, wdata);
-
-    return true;
 }
 
 // Computes an xvector from a chunk of speech features.
@@ -112,10 +110,10 @@ bool KaldiRecognizer::GetSpkVector(Vector<BaseFloat> &out_xvector, int *num_spk_
     Vector<BaseFloat> feat(spk_feature_->Dim());
     KALDI_LOG << feat;
     for (int i = 0; i < num_frames; ++i) {
-       if (std::find(nonsilence_frames.begin(),
-                     nonsilence_frames.end(), i / 3) == nonsilence_frames.end()) {
-           continue;
-       }
+//       if (std::find(nonsilence_frames.begin(),
+//                     nonsilence_frames.end(), i / 3) == nonsilence_frames.end()) {
+//           continue;
+//       }
 
        spk_feature_->GetFrame(i + frame_offset_ * 3, &feat);
        mfcc.CopyRowFromVec(feat, num_nonsilence_frames);

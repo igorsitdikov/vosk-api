@@ -40,9 +40,9 @@ class KaldiRecognizer {
 public:
     KaldiRecognizer(float sample_frequency, SpkModel *spk_model);
     ~KaldiRecognizer();
-    bool AcceptWaveform(const char *data, int len);
-    bool AcceptWaveform(const short *sdata, int len);
-    bool AcceptWaveform(const float *fdata, int len);
+    void AcceptWaveform(const char *data, int len);
+    void AcceptWaveform(const short *sdata, int len);
+    void AcceptWaveform(const float *fdata, int len);
     const char* FinalResult();
 
 private:
@@ -50,7 +50,7 @@ private:
     void UpdateSilenceWeights();
     const char *StoreEmptyReturn();
     const char *MbrResult();
-    bool AcceptWaveform(Vector<BaseFloat> &wdata);
+    void AcceptWaveform(Vector<BaseFloat> &wdata);
     bool GetSpkVector(Vector<BaseFloat> &xvector, int *frames);
     const char *GetResult();
     const char *StoreReturn(const string &res);

@@ -68,17 +68,17 @@ VoskRecognizer *vosk_recognizer_new_spk(float sample_rate, VoskSpkModel *spk_mod
  *  @param data - audio data in PCM 16-bit mono format
  *  @param length - length of the audio data
  *  @returns true if silence is occured and you can retrieve a new utterance with result method */
-int vosk_recognizer_accept_waveform(VoskRecognizer *recognizer, const char *data, int length);
+void vosk_recognizer_accept_waveform(VoskRecognizer *recognizer, const char *data, int length);
 
 
 /** Same as above but the version with the short data for language bindings where you have
  *  audio as array of shorts */
-int vosk_recognizer_accept_waveform_s(VoskRecognizer *recognizer, const short *data, int length);
+void vosk_recognizer_accept_waveform_s(VoskRecognizer *recognizer, const short *data, int length);
 
 
 /** Same as above but the version with the float data for language bindings where you have
  *  audio as array of floats */
-int vosk_recognizer_accept_waveform_f(VoskRecognizer *recognizer, const float *data, int length);
+void vosk_recognizer_accept_waveform_f(VoskRecognizer *recognizer, const float *data, int length);
 
 /** Returns speech recognition result. Same as result, but doesn't wait for silence
  *  You usually call it in the end of the stream to get final bits of audio. It
