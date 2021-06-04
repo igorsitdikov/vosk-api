@@ -6,14 +6,14 @@ import glob
 import platform
 
 # Figure out environment for cross-compile
-vosk_source = os.getenv("VOSK_SOURCE", os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-system = os.environ.get('VOSK_PLATFORM', platform.system())
-architecture = os.environ.get('VOSK_ARCHITECTURE', platform.architecture()[0])
+sid_source = os.getenv("SID_SOURCE", os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+system = os.environ.get('SID_PLATFORM', platform.system())
+architecture = os.environ.get('SID_ARCHITECTURE', platform.architecture()[0])
 
 # Copy precompmilled libraries
 for lib in glob.glob(os.path.join(vosk_source, "src/lib*.*")):
     print ("Adding library", lib)
-    shutil.copy(lib, "vosk")
+    shutil.copy(lib, "sid")
 
 # Create OS-dependent, but Python-independent wheels.
 try:
@@ -44,15 +44,15 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="spk",
-    version="0.3.29",
-    author="Alpha Cephei Inc",
-    author_email="contact@alphacephei.com",
-    description="Offline open source speech recognition API based on Kaldi and Vosk",
+    version="0.0.1",
+    author="Igor Sitdikov",
+    author_email="ihar.sitdzikau@yandex.ru",
+    description="Speaker Identification",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/alphacep/vosk-api",
+    url="https://github.com/igorsitdikov/vosk-api",
     packages=setuptools.find_packages(),
-    package_data = {'vosk': ['*.so', '*.dll', '*.dyld']},
+    package_data = {'sid': ['*.so', '*.dll', '*.dyld']},
     include_package_data=True,
     classifiers=[
         'Programming Language :: Python :: 3',
@@ -67,5 +67,5 @@ setuptools.setup(
     zip_safe=False, # Since we load so file from the filesystem, we can not run from zip file
     setup_requires=['cffi>=1.0'],
     install_requires=['cffi>=1.0'],
-    cffi_modules=['vosk_builder.py:ffibuilder'],
+    cffi_modules=['sid_builder.py:ffibuilder'],
 )

@@ -3,11 +3,11 @@
 import os
 from cffi import FFI
 
-vosk_root=os.environ.get("VOSK_SOURCE", "..")
+vosk_root=os.environ.get("SID_SOURCE", "..")
 cpp_command = "cpp " + vosk_root + "/src/vosk_api.h"
 
 ffibuilder = FFI()
-ffibuilder.set_source("vosk.vosk_cffi", None)
+ffibuilder.set_source("sid.sid_cffi", None)
 ffibuilder.cdef(os.popen(cpp_command).read())
 
 if __name__ == '__main__':

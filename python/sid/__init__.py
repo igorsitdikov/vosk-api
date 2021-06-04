@@ -1,7 +1,7 @@
 import os
 import sys
 
-from .vosk_cffi import ffi as _ffi
+from .sid_cffi import ffi as _ffi
 
 def open_dll():
     dlldir = os.path.abspath(os.path.dirname(__file__))
@@ -10,11 +10,11 @@ def open_dll():
         os.environ["PATH"] = dlldir + os.pathsep + os.environ['PATH']
         if hasattr(os, 'add_dll_directory'):
             os.add_dll_directory(dlldir)
-        return _ffi.dlopen(os.path.join(dlldir, "libvosk.dll"))
+        return _ffi.dlopen(os.path.join(dlldir, "libsid.dll"))
     elif sys.platform == 'linux':
-        return _ffi.dlopen(os.path.join(dlldir, "libvosk.so"))
+        return _ffi.dlopen(os.path.join(dlldir, "libsid.so"))
     elif sys.platform == 'darwin':
-        return _ffi.dlopen(os.path.join(dlldir, "libvosk.dyld"))
+        return _ffi.dlopen(os.path.join(dlldir, "libsid.dyld"))
     else:
         raise TypeError("Unsupported platform")
 
@@ -43,7 +43,7 @@ class KaldiRecognizer(object):
         _c.vosk_recognizer_set_spk_model(self._handle, spk_model._handle)
 
     def AcceptWaveform(self, data):
-        return _c.vosk_recognizer_accept_waveform(self._handle, data, len(data))
+        _c.vosk_recognizer_accept_waveform(self._handle, data, len(data))
 
     def FinalResult(self):
         return _ffi.string(_c.vosk_recognizer_final_result(self._handle)).decode('utf-8')

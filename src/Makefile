@@ -58,9 +58,9 @@ CFLAGS+=-DHAVE_CUDA=1 -I$(CUDA_ROOT)/include
 LIBS+=-L$(CUDA_ROOT)/lib64 -lcublas -lcusparse -lcudart -lcurand -lcufft -lcusolver -lnvToolsExt
 endif
 
-all: libvosk.$(EXT)
+all: libsid.$(EXT)
 
-libvosk.$(EXT): $(VOSK_SOURCES:.cc=.o)
+libsid.$(EXT): $(VOSK_SOURCES:.cc=.o)
 	$(CXX) --shared -s -o $@ $^ $(LIBS) -lm -latomic $(EXTRA_LDFLAGS)
 
 %.o: %.cc
