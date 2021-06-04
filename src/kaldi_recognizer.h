@@ -52,17 +52,9 @@ private:
     const char *GetResult();
     const char *StoreReturn(const string &res);
 
-    Model *model_;
-    SingleUtteranceNnet3Decoder *decoder_;
-    fst::LookaheadFst<fst::StdArc, int32> *decode_fst_;
-    fst::StdVectorFst *g_fst_; // dynamically constructed grammar
-    OnlineNnet2FeaturePipeline *feature_pipeline_;
-    OnlineSilenceWeighting *silence_weighting_;
 
     SpkModel *spk_model_;
     OnlineBaseFeature *spk_feature_;
-
-    fst::MapFst<fst::StdArc, kaldi::LatticeArc, fst::StdToLatticeMapper<kaldi::BaseFloat> > *lm_fst_;
 
     float sample_frequency_;
     int32 frame_offset_;
