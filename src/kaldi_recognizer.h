@@ -12,9 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef VOSK_KALDI_RECOGNIZER_H
-#define VOSK_KALDI_RECOGNIZER_H
-
 #include "base/kaldi-common.h"
 #include "util/common-utils.h"
 #include "fstext/fstext-lib.h"
@@ -23,15 +20,15 @@
 #include "feat/feature-mfcc.h"
 #include "lat/kaldi-lattice.h"
 #include "lat/word-align-lattice.h"
-#include "lat/compose-lattice-pruned.h"
 #include "nnet3/am-nnet-simple.h"
 #include "nnet3/nnet-am-decodable-simple.h"
 #include "nnet3/nnet-utils.h"
 
+#include "model.h"
 #include "spk_model.h"
 
 using namespace kaldi;
-using namespace std;
+
 enum KaldiRecognizerState {
     RECOGNIZER_INITIALIZED,
     RECOGNIZER_RUNNING,
@@ -40,41 +37,40 @@ enum KaldiRecognizerState {
 };
 
 class KaldiRecognizer {
-    public:
-        KaldiRecognizer(float sample_frequency, SpkModel *spk_model);
-        ~KaldiRecognizer();
-        bool AcceptWaveform(const char *data, int len);
-        bool AcceptWaveform(const short *sdata, int len);
-        bool AcceptWaveform(const float *fdata, int len);
-        const char* FinalResult();
+public:
+    KaldiRecognizer(SpkModel *spk_model, float sample_frequency);
+    ~KaldiRecognizer();
+    bool AcceptWaveform(const char *data, int len);
+    bool AcceptWaveform(const short *sdata, int len);
+    bool AcceptWaveform(const float *fdata, int len);
+    const char* FinalResult();
 
-    private:
-        bool AcceptWaveform(Vector<BaseFloat> &wdata);
-        bool GetSpkVector(Vector<BaseFloat> &out_xvector, int *frames);
-        const char *StoreEmptyReturn();
-        const char *StoreReturn(const string &res);
-        const char *MbrResult();
+private:
+    void CleanUp();
+    void UpdateSilenceWeights();
+    bool AcceptWaveform(Vector<BaseFloat> &wdata);
+    bool GetSpkVector(Vector<BaseFloat> &xvector, int *frames);
+    const char *GetResult();
+    const char *StoreReturn(const string &res);
 
+    Model *model_;
+    SingleUtteranceNnet3Decoder *decoder_;
+    fst::LookaheadFst<fst::StdArc, int32> *decode_fst_;
+    fst::StdVectorFst *g_fst_; // dynamically constructed grammar
+    OnlineNnet2FeaturePipeline *feature_pipeline_;
+    OnlineSilenceWeighting *silence_weighting_;
 
-        // Speaker identification
-        SpkModel *spk_model_ = nullptr;
-        OnlineBaseFeature *spk_feature_ = nullptr;
-        OnlineNnet2FeaturePipeline *feature_pipeline_ = nullptr;
-        OnlineSilenceWeighting *silence_weighting_ = nullptr;
+    SpkModel *spk_model_;
+    OnlineBaseFeature *spk_feature_;
 
-        // Rescoring
-        fst::ArcMapFst<fst::StdArc, kaldi::LatticeArc, fst::StdToLatticeMapper<kaldi::BaseFloat> > *lm_fst_ = nullptr;
+    fst::MapFst<fst::StdArc, kaldi::LatticeArc, fst::StdToLatticeMapper<kaldi::BaseFloat> > *lm_fst_;
 
-        int max_alternatives_ = 0; // Disable alternatives by default
+    float sample_frequency_;
+    int32 frame_offset_;
 
-        float sample_frequency_;
-        int32 frame_offset_;
+    int64 samples_processed_;
+    int64 samples_round_start_;
 
-        int64 samples_processed_;
-        int64 samples_round_start_;
-
-        KaldiRecognizerState state_;
-        string last_result_;
+    KaldiRecognizerState state_;
+    string last_result_;
 };
-
-#endif /* VOSK_KALDI_RECOGNIZER_H */

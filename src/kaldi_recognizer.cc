@@ -64,24 +64,15 @@ bool KaldiRecognizer::AcceptWaveform(Vector<BaseFloat> &wdata)
 {
     state_ = RECOGNIZER_RUNNING;
 
-    int step = static_cast<int>(sample_frequency_ * 0.2);
-    for (int i = 0; i < wdata.Dim(); i+= step) {
-        SubVector<BaseFloat> r = wdata.Range(i, std::min(step, wdata.Dim() - i));
-        feature_pipeline_->AcceptWaveform(sample_frequency_, r);
-    }
-    samples_processed_ += wdata.Dim();
+    spk_feature_->AcceptWaveform(sample_frequency_, wdata);
 
-    if (spk_feature_) {
-        spk_feature_->AcceptWaveform(sample_frequency_, wdata);
-    }
-
-    return false;
+    return true;
 }
 
 // Computes an xvector from a chunk of speech features.
 static void RunNnetComputation(const MatrixBase<BaseFloat> &features,
     const nnet3::Nnet &nnet, nnet3::CachingOptimizingCompiler *compiler,
-    Vector<BaseFloat> *xvector) 
+    Vector<BaseFloat> *xvector)
 {
     nnet3::ComputationRequest request;
     request.need_model_derivative = false;
@@ -112,11 +103,6 @@ static void RunNnetComputation(const MatrixBase<BaseFloat> &features,
 bool KaldiRecognizer::GetSpkVector(Vector<BaseFloat> &out_xvector, int *num_spk_frames)
 {
     vector<int32> nonsilence_frames;
-    if (silence_weighting_->Active() && feature_pipeline_->NumFramesReady() > 0) {
-        silence_weighting_->GetNonsilenceFrames(feature_pipeline_->NumFramesReady(),
-                                          frame_offset_ * 3,
-                                          &nonsilence_frames);
-    }
 
     int num_frames = spk_feature_->NumFramesReady() - frame_offset_ * 3;
     Matrix<BaseFloat> mfcc(num_frames, spk_feature_->Dim());
