@@ -113,7 +113,6 @@ bool KaldiRecognizer::GetSpkVector(Vector<BaseFloat> &out_xvector, int *num_spk_
 {
     vector<int32> nonsilence_frames;
     if (silence_weighting_->Active() && feature_pipeline_->NumFramesReady() > 0) {
-        silence_weighting_->ComputeCurrentTraceback(decoder_->Decoder(), true);
         silence_weighting_->GetNonsilenceFrames(feature_pipeline_->NumFramesReady(),
                                           frame_offset_ * 3,
                                           &nonsilence_frames);

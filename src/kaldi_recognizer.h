@@ -59,6 +59,8 @@ class KaldiRecognizer {
         // Speaker identification
         SpkModel *spk_model_ = nullptr;
         OnlineBaseFeature *spk_feature_ = nullptr;
+        OnlineNnet2FeaturePipeline *feature_pipeline_ = nullptr;
+        OnlineSilenceWeighting *silence_weighting_ = nullptr;
 
         // Rescoring
         fst::ArcMapFst<fst::StdArc, kaldi::LatticeArc, fst::StdToLatticeMapper<kaldi::BaseFloat> > *lm_fst_ = nullptr;
