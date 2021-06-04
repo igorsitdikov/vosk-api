@@ -106,7 +106,7 @@ bool KaldiRecognizer::GetSpkVector(Vector<BaseFloat> &out_xvector, int *num_spk_
 
     int num_frames = spk_feature_->NumFramesReady() - frame_offset_ * 3;
     Matrix<BaseFloat> mfcc(num_frames, spk_feature_->Dim());
-
+    KALDI_LOG << mfcc;
     // Not very efficient, would be nice to have faster search
     int num_nonsilence_frames = 0;
     Vector<BaseFloat> feat(spk_feature_->Dim());
