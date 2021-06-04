@@ -24,7 +24,6 @@
 #include "nnet3/nnet-am-decodable-simple.h"
 #include "nnet3/nnet-utils.h"
 
-#include "model.h"
 #include "spk_model.h"
 
 using namespace kaldi;
