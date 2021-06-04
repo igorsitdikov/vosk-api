@@ -197,11 +197,7 @@ const char* KaldiRecognizer::FinalResult()
 }
 const char *KaldiRecognizer::StoreEmptyReturn()
 {
-    if (!max_alternatives_) {
-        return StoreReturn("{\"text\": \"\"}");
-    } else {
-        return StoreReturn("{\"alternatives\" : [{\"text\": \"\", \"confidence\" : 1.0}] }");
-    }
+    return StoreReturn("{\"text\": \"\"}");
 }
 // Store result in recognizer and return as const string
 const char *KaldiRecognizer::StoreReturn(const string &res)
