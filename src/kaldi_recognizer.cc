@@ -17,6 +17,7 @@
 #include "fstext/fstext-utils.h"
 #include "lat/sausages.h"
 
+using namespace std;
 using namespace fst;
 using namespace kaldi::nnet3;
 
