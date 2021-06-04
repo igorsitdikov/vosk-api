@@ -121,7 +121,7 @@ bool KaldiRecognizer::GetSpkVector(Vector<BaseFloat> &out_xvector, int *num_spk_
        mfcc.CopyRowFromVec(feat, num_nonsilence_frames);
        num_nonsilence_frames++;
     }
-
+    KALDI_LOG << mfcc;
     *num_spk_frames = num_nonsilence_frames;
     KALDI_LOG << num_nonsilence_frames;
     // Don't extract vector if not enough data
