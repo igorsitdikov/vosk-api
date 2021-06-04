@@ -43,7 +43,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="vosk",
+    name="spk",
     version="0.3.29",
     author="Alpha Cephei Inc",
     author_email="contact@alphacephei.com",
