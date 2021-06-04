@@ -13,7 +13,7 @@ cp /opt/vosk-api/src/*.so /io/wheelhouse/linux
 
 # Build wheel and put to the output folder
 mkdir -p /opt/wheelhouse
-export VOSK_SOURCE=/opt/vosk-api
+export SID_SOURCE=/opt/vosk-api
 /opt/python/cp37*/bin/pip -v wheel /opt/vosk-api/python --no-deps -w /opt/wheelhouse
 
 # Fix manylinux
